@@ -1,0 +1,41 @@
+.delete-dialog {
+  max-width: 400px;
+  text-align: center;
+  padding-top: 2rem;
+}
+
+.dialog-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: rgba(239, 68, 68, 0.1);
+  margin-bottom: 1rem;
+}
+
+.danger-icon {
+  color: var(--accent-danger);
+}
+
+.dialog-body h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+}
+
+.dialog-body p {
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.delete-dialog .modal-actions {
+  justify-content: stretch;
+}
+
+.delete-dialog .modal-actions button {
+  flex: 1;
+}
