@@ -33,13 +33,6 @@ export const createTask = async (
 ): Promise<void> => {
   const { title, description, status } = req.body;
 
-  if (!title || title.trim() === "") {
-    res.status(400).json({
-      message: "Title is required",
-    });
-    return;
-  }
-
   const task = await taskService.create({
     title,
     description,
