@@ -5,9 +5,9 @@ import { EmptyState } from '../components/EmptyState/EmptyState';
 import { TaskForm } from '../components/TaskForm/TaskForm';
 import { DeleteDialog } from '../components/DeleteDialog/DeleteDialog';
 import { AboutSection } from '../components/AboutSection/AboutSection';
+import { Toast } from '../components/Toast/Toast';
 import type { Task } from '../types/task';
 import { TaskStatus } from '../types/task';
-// import { dummyTasks } from '../data/dummyTasks';
 import * as taskService from '../services/task.service';
 import './HomePage.css';
 
@@ -19,6 +19,11 @@ export function HomePage() {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [taskToEdit, setTaskToEdit] = useState<Task | null>(null);
   const [taskToDelete, setTaskToDelete] = useState<Task | null>(null);
+  const [toast, setToast] = useState<{ id: string; message: string } | null>(null);
+
+  const showToast = (message: string) => {
+    setToast({ id: crypto.randomUUID(), message });
+  };
 
   // Stats
   const totalTasks = tasks.length;
@@ -65,6 +70,7 @@ export function HomePage() {
           status: taskData.status ?? taskToEdit.status,
         });
         setTasks(prev => prev.map(t => (t.id === updated.id ? updated : t)));
+        showToast('Task updated successfully');
       } else {
         const created = await taskService.createTask({
           title: taskData.title || '',
@@ -72,6 +78,7 @@ export function HomePage() {
           status: taskData.status || TaskStatus.PENDING,
         });
         setTasks(prev => [created, ...prev]);
+        showToast('Task created successfully');
       }
     } catch {
       setError('Unable to save task. Please try again.');
@@ -83,6 +90,7 @@ export function HomePage() {
     try {
       await taskService.deleteTask(taskToDelete.id);
       setTasks(prev => prev.filter(t => t.id !== taskToDelete.id));
+      showToast('Task deleted successfully');
     } catch {
       setError('Unable to delete task. Please try again.');
     }
@@ -142,6 +150,14 @@ export function HomePage() {
         onClose={() => setIsDeleteDialogOpen(false)}
         onConfirm={handleDeleteTask}
       />
+
+      {toast && (
+        <Toast 
+          key={toast.id} 
+          message={toast.message} 
+          onClose={() => setToast(null)} 
+        />
+      )}
     </MainLayout>
   );
 }
