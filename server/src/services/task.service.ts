@@ -7,3 +7,11 @@ export const findAll = async () => {
     },
   });
 };
+
+export const findById = async (id: number) => {
+  return prisma.task.findUnique({
+    where: {
+      id,
+    },
+  });
+};
