@@ -59,3 +59,13 @@
     gap: 1.5rem;
   }
 }
+
+.state-message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding: 3rem 1rem;
+  text-align: center;
+  color: var(--text-secondary);
+}
