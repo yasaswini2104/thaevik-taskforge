@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { MainLayout } from '../layouts/MainLayout';
 import { TaskList } from '../components/TaskList/TaskList';
 import { EmptyState } from '../components/EmptyState/EmptyState';
@@ -7,11 +7,14 @@ import { DeleteDialog } from '../components/DeleteDialog/DeleteDialog';
 import { AboutSection } from '../components/AboutSection/AboutSection';
 import type { Task } from '../types/task';
 import { TaskStatus } from '../types/task';
-import { dummyTasks } from '../data/dummyTasks';
+// import { dummyTasks } from '../data/dummyTasks';
+import * as taskService from '../services/task.service';
 import './HomePage.css';
 
 export function HomePage() {
-  const [tasks, setTasks] = useState<Task[]>(dummyTasks);
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState('');
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [taskToEdit, setTaskToEdit] = useState<Task | null>(null);
@@ -20,6 +23,23 @@ export function HomePage() {
   // Stats
   const totalTasks = tasks.length;
   const completedTasks = tasks.filter(t => t.status === TaskStatus.COMPLETED).length;
+
+  const loadTasks = async () => {
+    setIsLoading(true);
+    setError('');
+    try {
+      const data = await taskService.getTasks();
+      setTasks(data);
+    } catch {
+      setError('Unable to load tasks. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadTasks();
+  }, []);
 
   const handleOpenCreateForm = () => {
     setTaskToEdit(null);
@@ -36,28 +56,35 @@ export function HomePage() {
     setIsDeleteDialogOpen(true);
   };
 
-  const handleSaveTask = (taskData: Partial<Task>) => {
-    if (taskToEdit) {
-      // Update existing task
-      setTasks(prevTasks => prevTasks.map(t => 
-        t.id === taskToEdit.id ? { ...t, ...taskData } as Task : t
-      ));
-    } else {
-      // Create new task
-      const newTask: Task = {
-        id: crypto.randomUUID(),
-        title: taskData.title || '',
-        description: taskData.description || '',
-        status: taskData.status || TaskStatus.PENDING,
-        createdAt: new Date().toISOString(),
-      };
-      setTasks(prevTasks => [newTask, ...prevTasks]);
+  const handleSaveTask = async (taskData: Partial<Task>) => {
+    try {
+      if (taskToEdit) {
+        const updated = await taskService.updateTask(taskToEdit.id, {
+          title: taskData.title ?? taskToEdit.title,
+          description: taskData.description ?? taskToEdit.description,
+          status: taskData.status ?? taskToEdit.status,
+        });
+        setTasks(prev => prev.map(t => (t.id === updated.id ? updated : t)));
+      } else {
+        const created = await taskService.createTask({
+          title: taskData.title || '',
+          description: taskData.description || '',
+          status: taskData.status || TaskStatus.PENDING,
+        });
+        setTasks(prev => [created, ...prev]);
+      }
+    } catch {
+      setError('Unable to save task. Please try again.');
     }
   };
 
-  const handleDeleteTask = () => {
-    if (taskToDelete) {
-      setTasks(prevTasks => prevTasks.filter(t => t.id !== taskToDelete.id));
+  const handleDeleteTask = async () => {
+    if (!taskToDelete) return;
+    try {
+      await taskService.deleteTask(taskToDelete.id);
+      setTasks(prev => prev.filter(t => t.id !== taskToDelete.id));
+    } catch {
+      setError('Unable to delete task. Please try again.');
     }
   };
 
@@ -81,11 +108,20 @@ export function HomePage() {
       </div>
 
       <div className="home-content">
-        {tasks.length > 0 ? (
-          <TaskList 
-            tasks={tasks} 
-            onEdit={handleOpenEditForm} 
-            onDelete={handleOpenDeleteDialog} 
+        {isLoading ? (
+          <div className="state-message">
+            <p>Loading tasks...</p>
+          </div>
+        ) : error ? (
+          <div className="state-message">
+            <p>{error}</p>
+            <button className="btn-primary" onClick={loadTasks}>Retry</button>
+          </div>
+        ) : tasks.length > 0 ? (
+          <TaskList
+            tasks={tasks}
+            onEdit={handleOpenEditForm}
+            onDelete={handleOpenDeleteDialog}
           />
         ) : (
           <EmptyState onAddTask={handleOpenCreateForm} />
