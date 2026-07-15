@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 
 import healthRoutes from "./routes/health.routes.js";
+import taskRoutes from "./routes/task.routes.js";
 
 const app = express();
 
@@ -11,5 +12,6 @@ app.use(express.json());
 
 // Routes
 app.use("/api/health", healthRoutes);
+app.use("/api/tasks", taskRoutes);
 
 export default app;
