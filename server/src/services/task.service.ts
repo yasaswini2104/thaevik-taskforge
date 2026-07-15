@@ -22,3 +22,12 @@ export const create = async (data: CreateTaskDto) => {
     data,
   });
 };
+
+export const update = async (id: number, data: CreateTaskDto) => {
+  return prisma.task.update({
+    where: {
+      id,
+    },
+    data,
+  });
+};
