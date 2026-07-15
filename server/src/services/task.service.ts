@@ -31,3 +31,11 @@ export const update = async (id: number, data: CreateTaskDto) => {
     data,
   });
 };
+
+export const remove = async (id: number) => {
+  return prisma.task.delete({
+    where: {
+      id,
+    },
+  });
+};

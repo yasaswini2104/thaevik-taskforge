@@ -74,3 +74,25 @@ export const updateTask = async (
 
   res.status(200).json(updatedTask);
 };
+
+export const deleteTask = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  const id = Number(req.params.id);
+
+  const existingTask = await taskService.findById(id);
+
+  if (!existingTask) {
+    res.status(404).json({
+      message: "Task not found",
+    });
+    return;
+  }
+
+  await taskService.remove(id);
+
+  res.status(200).json({
+    message: "Task deleted successfully",
+  });
+};
