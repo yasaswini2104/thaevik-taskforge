@@ -1,24 +1,20 @@
-import { Router } from "express";
-import { validate } from "../middleware/validate.middleware.js";
-import { asyncHandler } from "../utils/asyncHandler.js";
+import { Router } from 'express';
+import { validate } from '../middleware/validate.middleware.js';
 import {
-  getAllTasks, 
+  getAllTasks,
   getTaskById,
   createTask,
   updateTask,
-  deleteTask
-} from "../controllers/task.controller.js";
-import {
-  createTaskSchema,
-  updateTaskSchema,
-} from "../validators/task.validator.js";
+  deleteTask,
+} from '../controllers/task.controller.js';
+import { createTaskSchema, updateTaskSchema } from '../validators/task.validator.js';
 
 const router = Router();
 
-router.get("/", asyncHandler(getAllTasks));
-router.get("/:id", asyncHandler(getTaskById));
-router.post("/", validate(createTaskSchema), asyncHandler(createTask));
-router.put("/:id", validate(updateTaskSchema), asyncHandler(updateTask));
-router.delete("/:id", asyncHandler(deleteTask));
+router.get('/', getAllTasks);
+router.get('/:id', getTaskById);
+router.post('/', validate(createTaskSchema), createTask);
+router.put('/:id', validate(updateTaskSchema), updateTask);
+router.delete('/:id', deleteTask);
 
 export default router;

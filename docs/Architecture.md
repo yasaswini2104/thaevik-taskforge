@@ -65,8 +65,6 @@ server/
 │   ├── middleware/
 │   │   ├── validate.middleware.ts
 │   │   └── error.middleware.ts
-│   ├── utils/
-│   │   └── asyncHandler.ts
 │   └── types/
 │       └── task.types.ts
 ```
@@ -116,10 +114,6 @@ Services contain the application's business logic and all Prisma queries. This l
 ### Prisma Configuration
 
 `config/prisma.ts` configures Prisma 7 with the MariaDB Driver Adapter and manages the runtime database connection.
-
-### Utilities
-
-`asyncHandler` wraps asynchronous route handlers so rejected promises are automatically forwarded to the global error handler.
 
 ### Error Middleware
 
